@@ -1,11 +1,17 @@
 package br.gov.sp.cps.fatecipiranga;
+
 import java.util.Random;
 
 public class Terrorista {
     private int energia;
     private String nome;
     private int quantidadeGranadas;
-    private String armamento;
+
+    // Armas do terrorista
+    private Faca faca = new Faca();
+    private Pistola pistola = new Pistola();
+    private Fuzil fuzil = new Fuzil();
+    private Object armaAtual; // pode ser Faca, Pistola ou Fuzil
 
     private Random gerarNumero = new Random();
 
@@ -13,7 +19,7 @@ public class Terrorista {
         setNome(nome);
         setEnergia(energia);
         setQuantidadeGranadas(quantidadeGranadas);
-        gerarArmamento();
+        gerarArmamento(); // arma inicial
     }
 
     // Getters
@@ -22,7 +28,10 @@ public class Terrorista {
     }
 
     public String getArmamento() {
-        return armamento;
+        if (armaAtual instanceof Faca) return "Faca";
+        if (armaAtual instanceof Pistola) return "Pistola";
+        if (armaAtual instanceof Fuzil) return "Fuzil";
+        return "Desarmado";
     }
 
     public String getNome() {
@@ -33,15 +42,11 @@ public class Terrorista {
         return quantidadeGranadas;
     }
 
-    // Setters (sempre travando entre limites)
+    // Setters (travados entre limites)
     public void setEnergia(int energia) {
-        if (energia < 0) {
-            this.energia = 0;
-        } else if (energia > 10) {
-            this.energia = 10;
-        } else {
-            this.energia = energia;
-        }
+        if (energia < 0) this.energia = 0;
+        else if (energia > 10) this.energia = 10;
+        else this.energia = energia;
     }
 
     public void setNome(String nome) {
@@ -49,27 +54,24 @@ public class Terrorista {
     }
 
     public void setQuantidadeGranadas(int quantidadeGranadas) {
-        if (quantidadeGranadas < 0) {
-            this.quantidadeGranadas = 0;
-        } else if (quantidadeGranadas > 5) {
-            this.quantidadeGranadas = 5;
-        } else {
-            this.quantidadeGranadas = quantidadeGranadas;
-        }
+        if (quantidadeGranadas < 0) this.quantidadeGranadas = 0;
+        else if (quantidadeGranadas > 5) this.quantidadeGranadas = 5;
+        else this.quantidadeGranadas = quantidadeGranadas;
     }
 
-    // Sorteio de arma
+    // Escolhe arma aleatoriamente
     public void gerarArmamento() {
         int opcaoArmas = gerarNumero.nextInt(3);
+
         switch (opcaoArmas) {
             case 0:
-                this.armamento = "Faca";
+                armaAtual = faca;
                 break;
             case 1:
-                this.armamento = "Pistola";
+                armaAtual = pistola;
                 break;
             case 2:
-                this.armamento = "Fuzil";
+                armaAtual = fuzil;
                 break;
         }
     }
@@ -88,8 +90,19 @@ public class Terrorista {
         }
     }
 
-    public void atacar() {
-        System.out.println(nome + " atacou com " + armamento);
+    // ****** ATAQUE COM DANO REAL ******
+    public int atacar() {
+        gerarArmamento(); // escolhe arma aleatória
+
+        int dano = 0;
+        String armaTexto = getArmamento();
+
+        if (armaAtual instanceof Faca) dano = ((Faca) armaAtual).atacar();
+        if (armaAtual instanceof Pistola) dano = ((Pistola) armaAtual).atacar();
+        if (armaAtual instanceof Fuzil) dano = ((Fuzil) armaAtual).atacar();
+
+        System.out.println(nome + " atacou com " + armaTexto + " causando " + dano + " de dano");
+        return dano;
     }
 
     public void passarAVez() {
@@ -99,6 +112,6 @@ public class Terrorista {
     @Override
     public String toString() {
         return String.format("%s - Energia: %d, Granadas: %d, Arma: %s",
-                nome, energia, quantidadeGranadas, armamento);
+                nome, energia, quantidadeGranadas, getArmamento());
     }
 }
