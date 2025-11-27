@@ -1,6 +1,11 @@
 package br.gov.sp.cps.fatecipiranga;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
+
+import br.gov.sp.cps.fatecipiranga.db.HistoricoDAO;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -142,10 +147,45 @@ public class App {
                 System.out.println(
                         "\n>--------------<\nFim de Partida\n>--------------<\n");
                 break;
+
+                
             }
 
         }
+        // SALVAR HISTÓRICO DA PARTIDA NO BANCO
+        HistoricoDAO dao = new HistoricoDAO();
+        salvarHistoricoNoBanco(dao, policial);
+        salvarHistoricoNoBanco(dao, terrorista);
+
+        System.out.println("\nHistórico salvo no banco!");
+
     }
+
+    static void salvarHistoricoNoBanco(HistoricoDAO dao, Object personagemObj) throws Exception {
+    String nome;
+    ArrayList<String> lista;
+
+    if (personagemObj instanceof Policial p) {
+        nome = p.getNome();
+        lista = p.getAtkHis();
+    } else {
+        Terrorista t = (Terrorista) personagemObj;
+        nome = t.getNome();
+        lista = t.getAtkHis();
+    }
+
+    // Conta quantas vezes cada arma foi usada
+    Map<String, Integer> contador = new HashMap<>();
+
+    for (String arma : lista) {
+        contador.put(arma, contador.getOrDefault(arma, 0) + 1);
+    }
+
+    // Salva no banco
+    for (var entry : contador.entrySet()) {
+        dao.salvar(nome, entry.getKey(), entry.getValue());
+    }
+}
 
     static int aplicarDano(String arma) {
         int dano = 0;

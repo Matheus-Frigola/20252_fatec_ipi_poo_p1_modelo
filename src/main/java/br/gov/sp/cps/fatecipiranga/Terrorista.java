@@ -1,11 +1,13 @@
 package br.gov.sp.cps.fatecipiranga;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Terrorista {
     private int energia;
     private String nome;
     private int quantidadeGranadas;
+    private ArrayList<String> atkHis;
 
     // Armas do terrorista
     private Faca faca = new Faca();
@@ -20,7 +22,16 @@ public class Terrorista {
         setEnergia(energia);
         setQuantidadeGranadas(quantidadeGranadas);
         gerarArmamento(); // arma inicial
+
+        this.atkHis = new ArrayList<>();
     }
+
+
+     // Retorna o histórico de ataques
+    public ArrayList<String> getAtkHis() {
+        return this.atkHis;
+    }
+
 
     // Getters
     public int getEnergia() {
@@ -90,7 +101,6 @@ public class Terrorista {
         }
     }
 
-    // ****** ATAQUE COM DANO REAL ******
     public int atacar() {
         gerarArmamento(); // escolhe arma aleatória
 
@@ -101,6 +111,10 @@ public class Terrorista {
         if (armaAtual instanceof Pistola) dano = ((Pistola) armaAtual).atacar();
         if (armaAtual instanceof Fuzil) dano = ((Fuzil) armaAtual).atacar();
 
+        // ADICIONA A ARMA AO HISTÓRICO
+        atkHis.add(armaTexto);
+
+
         System.out.println(nome + " atacou com " + armaTexto + " causando " + dano + " de dano");
         return dano;
     }
@@ -108,6 +122,20 @@ public class Terrorista {
     public void passarAVez() {
         System.out.println(nome + " passou a vez");
     }
+
+
+    // Exibe o histórico de ataques
+    public void exibirHistorico() {
+        System.out.println("\n=== Histórico de " + nome + " ===");
+        if (atkHis.isEmpty()) {
+            System.out.println("Nenhum ataque realizado");
+        } else {
+            for (int i = 0; i < atkHis.size(); i++) {
+                System.out.println((i + 1) + ". " + atkHis.get(i));
+            }
+        }
+    }
+
 
     @Override
     public String toString() {
